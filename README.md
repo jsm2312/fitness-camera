@@ -8,7 +8,7 @@ This is an Android application that uses human pose estimation with TensorFlow L
 
 ## Progress
 
-* [Google Colab notebook with human pose estimation data](https://colab.research.google.com/drive/1OHTsNyr3Ry_bSw8dT9s77BZsXHe7i8HR)
+* [Google Colab notebook with human pose estimation data](https://colab.research.google.com/drive/1OHTsNyr3Ry_bSw8dT9s77BZsXHe7i8HR#scrollTo=uIbljMew7Wje)
 
 ## Background
 
