@@ -85,6 +85,8 @@ class PosenetActivity :
     Pair(BodyPart.RIGHT_KNEE, BodyPart.RIGHT_ANKLE)
   )
 
+  private val counter = RepetitionCounter()
+
   /** Threshold for confidence score. */
   private val minConfidence = 0.5
 
@@ -586,6 +588,7 @@ class PosenetActivity :
     // Perform inference.
     val person = posenet.estimateSinglePose(scaledBitmap)
     val canvas: Canvas = surfaceHolder!!.lockCanvas()
+    counter.OnFrame(person);
     draw(canvas, person, scaledBitmap)
   }
 
