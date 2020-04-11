@@ -61,6 +61,7 @@ import java.util.concurrent.Semaphore
 import java.util.concurrent.TimeUnit
 import kotlin.math.abs
 import org.tensorflow.lite.examples.posenet.lib.BodyPart
+import org.tensorflow.lite.examples.posenet.lib.Device
 import org.tensorflow.lite.examples.posenet.lib.Person
 import org.tensorflow.lite.examples.posenet.lib.Posenet
 
@@ -442,11 +443,7 @@ class PosenetActivity :
       )
       image.close()
 
-      // Process an image for analysis in every 3 frames.
-      frameCounter = (frameCounter + 1) % 3
-      if (frameCounter == 0) {
-        processImage(rotatedBitmap)
-      }
+      processImage(rotatedBitmap)
     }
   }
 

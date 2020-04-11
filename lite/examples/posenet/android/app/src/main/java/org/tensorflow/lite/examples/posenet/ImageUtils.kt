@@ -33,16 +33,9 @@ object ImageUtils {
     var b = expandY + 2066 * uNew
 
     // Clipping RGB values to be inside boundaries [ 0 , MAX_CHANNEL_VALUE ]
-    val checkBoundaries = { x: Int ->
-      when {
-        x > MAX_CHANNEL_VALUE -> MAX_CHANNEL_VALUE
-        x < 0 -> 0
-        else -> x
-      }
-    }
-    r = checkBoundaries(r)
-    g = checkBoundaries(g)
-    b = checkBoundaries(b)
+    r = if (r > MAX_CHANNEL_VALUE) MAX_CHANNEL_VALUE else if (r < 0) 0 else r
+    g = if (g > MAX_CHANNEL_VALUE) MAX_CHANNEL_VALUE else if (g < 0) 0 else g
+    b = if (b > MAX_CHANNEL_VALUE) MAX_CHANNEL_VALUE else if (b < 0) 0 else b
     return -0x1000000 or (r shl 6 and 0xff0000) or (g shr 2 and 0xff00) or (b shr 10 and 0xff)
   }
 
