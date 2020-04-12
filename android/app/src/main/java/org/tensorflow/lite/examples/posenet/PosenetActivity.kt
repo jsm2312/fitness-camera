@@ -21,6 +21,7 @@ import android.app.AlertDialog
 import android.app.Dialog
 import android.content.Context
 import android.content.pm.PackageManager
+import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
@@ -88,7 +89,7 @@ class PosenetActivity :
   )
 
   private var textView: TextView? = null
-  private val counter = RepetitionCounter()
+  private var counter: RepetitionCounter? = null
 
   /** Threshold for confidence score. */
   private val minConfidence = 0.5
@@ -223,6 +224,8 @@ class PosenetActivity :
     textView = view.findViewById(R.id.textView)
     surfaceView = view.findViewById(R.id.surfaceView)
     surfaceHolder = surfaceView!!.holder
+
+    counter = RepetitionCounter(this.context!!)
   }
 
   override fun onResume() {
@@ -305,6 +308,8 @@ class PosenetActivity :
         previewHeight = previewSize!!.height
         previewWidth = previewSize!!.width
 
+        setVideoSize()
+
         // Initialize the storage bitmaps once when the resolution is known.
         rgbBytes = IntArray(previewWidth * previewHeight)
 
@@ -328,6 +333,13 @@ class PosenetActivity :
     }
   }
 
+  private fun setVideoSize() {
+    //val ratio = previewWidth.toFloat() / previewHeight.toFloat()
+    val screenWidth = Resources.getSystem().getDisplayMetrics().widthPixels
+    //val screenHeight = Resources.getSystem().getDisplayMetrics().heightPixels
+    surfaceHolder!!.setFixedSize(screenWidth, screenWidth)
+  }
+
   /**
    * Opens the camera specified by [PosenetActivity.cameraId].
    */
@@ -340,7 +352,7 @@ class PosenetActivity :
     val manager = activity!!.getSystemService(Context.CAMERA_SERVICE) as CameraManager
     try {
       // Wait for camera to open - 2.5 seconds is sufficient
-      if (!cameraOpenCloseLock.tryAcquire(2500, TimeUnit.MILLISECONDS)) {
+      if (!cameraOpenCloseLock.tryAcquire(1000, TimeUnit.MILLISECONDS)) {
         throw RuntimeException("Time out waiting to lock camera opening.")
       }
       manager.openCamera(cameraId!!, stateCallback, backgroundHandler)
@@ -523,12 +535,12 @@ class PosenetActivity :
     bottom = top + screenHeight
 
     setPaint()
-//    canvas.drawBitmap(
-//      bitmap,
-//      Rect(0, 0, bitmap.width, bitmap.height),
-//      Rect(left, top, right, bottom),
-//      paint
-//    )
+    canvas.drawBitmap(
+      bitmap,
+      Rect(0, 0, bitmap.width, bitmap.height),
+      Rect(left, top, right, bottom),
+      paint
+    )
 
     val widthRatio = screenWidth.toFloat() / MODEL_WIDTH
     val heightRatio = screenHeight.toFloat() / MODEL_HEIGHT
@@ -593,7 +605,10 @@ class PosenetActivity :
     var person = posenet.estimateSinglePose(scaledBitmap)
     person = swapBodyParts(person)
     val canvas: Canvas = surfaceHolder!!.lockCanvas()
-    counter.OnFrame(person)
+    val count = counter?.OnFrame(person)
+    this.activity!!.runOnUiThread{
+        textView!!.text = (count).toString()
+    }
     draw(canvas, person, scaledBitmap)
   }
 
@@ -617,7 +632,7 @@ class PosenetActivity :
     if (person.keyPoints[right.ordinal].score >= minConfidence
       && person.keyPoints[left.ordinal].score >= minConfidence
       && person.keyPoints[right.ordinal].position.x > person.keyPoints[left.ordinal].position.x) {
-      Log.i("posenet", "Swapping ${left} and ${right}.");
+      //Log.i("posenet", "Swapping ${left} and ${right}.");
       val temp = person.keyPoints[right.ordinal]
       person.keyPoints[right.ordinal] = person.keyPoints[left.ordinal]
       person.keyPoints[left.ordinal] = temp
