@@ -12,7 +12,7 @@ This is an Android application that uses human pose estimation with TensorFlow L
 
 ![](https://i.imgur.com/ej0EFiG.gif)
 
-# Under the hood:
+# Under the hood
 
 [Google Colab notebook with human pose estimation data](https://colab.research.google.com/drive/1OHTsNyr3Ry_bSw8dT9s77BZsXHe7i8HR#scrollTo=uIbljMew7Wje)
 
