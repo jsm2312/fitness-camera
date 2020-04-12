@@ -1,11 +1,27 @@
 package org.tensorflow.lite.examples.posenet
 
+import android.content.Context
+import android.speech.tts.TextToSpeech
+import android.speech.tts.TextToSpeech.OnInitListener
+import android.speech.tts.TextToSpeech.QUEUE_ADD
 import org.tensorflow.lite.examples.posenet.lib.BodyPart
 import org.tensorflow.lite.examples.posenet.lib.Person
-import java.util.*
 
-class RepetitionCounter {
-    val MIN_AMPLITUDE = 10
+
+class RepetitionCounter(context: Context) {
+
+    val tts: TextToSpeech
+
+    init {
+        tts = TextToSpeech(context,
+            OnInitListener { status ->
+                if (status == TextToSpeech.SUCCESS) {
+
+                }
+            })
+    }
+
+    val MIN_AMPLITUDE = 40
     val REP_THRESHOLD = 0.8
     val MIN_CONFIDENCE = 0.5
 
@@ -31,6 +47,7 @@ class RepetitionCounter {
                         if (top - bottom > MIN_AMPLITUDE) {
                             count++
                             goal = -1
+                            OnRep()
                         }
                     }
                     else if (goal == -1 && dy < 0 && (top - y) > (top - bottom) * REP_THRESHOLD) {
@@ -62,5 +79,9 @@ class RepetitionCounter {
         val ys = person.keyPoints.map { kp -> if (kp.score >= 0.5) kp.position.y.toString() else "" }
         val values = ys.joinToString(",")
         csv += "${x},${values}\n"
+    }
+
+    fun OnRep() {
+        tts.speak(count.toString(), QUEUE_ADD, null)
     }
 }
