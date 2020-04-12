@@ -84,4 +84,8 @@ class RepetitionCounter(context: Context) {
     fun OnRep() {
         tts.speak(count.toString(), QUEUE_ADD, null)
     }
+
+    fun Reset() {
+        count = 0
+    }
 }

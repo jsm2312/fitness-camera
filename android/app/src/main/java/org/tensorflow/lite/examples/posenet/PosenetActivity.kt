@@ -72,6 +72,12 @@ class PosenetActivity :
   Fragment(),
   ActivityCompat.OnRequestPermissionsResultCallback {
 
+  // 0 -> video + skeleton
+  // 1 -> skeleton
+  // 2 -> video
+  private val PREVIEW_MODES = 3
+  private var previewMode = 0
+
   /** List of body joints that should be connected.    */
   private val bodyJoints = listOf(
     Pair(BodyPart.LEFT_WRIST, BodyPart.LEFT_ELBOW),
@@ -224,8 +230,15 @@ class PosenetActivity :
     textView = view.findViewById(R.id.textView)
     surfaceView = view.findViewById(R.id.surfaceView)
     surfaceHolder = surfaceView!!.holder
-
     counter = RepetitionCounter(this.context!!)
+
+    textView?.setOnClickListener { view ->
+      counter?.Reset()
+    }
+
+    surfaceView?.setOnClickListener { view ->
+      previewMode = (previewMode + 1) % PREVIEW_MODES
+    }
   }
 
   override fun onResume() {
@@ -535,38 +548,42 @@ class PosenetActivity :
     bottom = top + screenHeight
 
     setPaint()
-    canvas.drawBitmap(
-      bitmap,
-      Rect(0, 0, bitmap.width, bitmap.height),
-      Rect(left, top, right, bottom),
-      paint
-    )
+    if (previewMode == 0 || previewMode == 2) {
+      canvas.drawBitmap(
+        bitmap,
+        Rect(0, 0, bitmap.width, bitmap.height),
+        Rect(left, top, right, bottom),
+        paint
+      )
+    }
 
     val widthRatio = screenWidth.toFloat() / MODEL_WIDTH
     val heightRatio = screenHeight.toFloat() / MODEL_HEIGHT
 
-    // Draw key points over the image.
-    for (keyPoint in person.keyPoints) {
-      if (keyPoint.score > minConfidence) {
-        val position = keyPoint.position
-        val adjustedX: Float = position.x.toFloat() * widthRatio + left
-        val adjustedY: Float = position.y.toFloat() * heightRatio + top
-        canvas.drawCircle(adjustedX, adjustedY, circleRadius, paint)
+    if (previewMode == 0 || previewMode == 1) {
+      // Draw key points over the image.
+      for (keyPoint in person.keyPoints) {
+        if (keyPoint.score > minConfidence) {
+          val position = keyPoint.position
+          val adjustedX: Float = position.x.toFloat() * widthRatio + left
+          val adjustedY: Float = position.y.toFloat() * heightRatio + top
+          canvas.drawCircle(adjustedX, adjustedY, circleRadius, paint)
+        }
       }
-    }
 
-    for (line in bodyJoints) {
-      if (
-        (person.keyPoints[line.first.ordinal].score > minConfidence) and
-        (person.keyPoints[line.second.ordinal].score > minConfidence)
-      ) {
-        canvas.drawLine(
-          person.keyPoints[line.first.ordinal].position.x.toFloat() * widthRatio + left,
-          person.keyPoints[line.first.ordinal].position.y.toFloat() * heightRatio + top,
-          person.keyPoints[line.second.ordinal].position.x.toFloat() * widthRatio + left,
-          person.keyPoints[line.second.ordinal].position.y.toFloat() * heightRatio + top,
-          paint
-        )
+      for (line in bodyJoints) {
+        if (
+          (person.keyPoints[line.first.ordinal].score > minConfidence) and
+          (person.keyPoints[line.second.ordinal].score > minConfidence)
+        ) {
+          canvas.drawLine(
+            person.keyPoints[line.first.ordinal].position.x.toFloat() * widthRatio + left,
+            person.keyPoints[line.first.ordinal].position.y.toFloat() * heightRatio + top,
+            person.keyPoints[line.second.ordinal].position.x.toFloat() * widthRatio + left,
+            person.keyPoints[line.second.ordinal].position.y.toFloat() * heightRatio + top,
+            paint
+          )
+        }
       }
     }
 
