@@ -60,7 +60,7 @@ class KeyPoint {
 }
 
 class Person {
-  var keyPoints = listOf<KeyPoint>()
+  var keyPoints = mutableListOf<KeyPoint>()
   var score: Float = 0.0f
 }
 
@@ -269,7 +269,7 @@ class Posenet(
       totalScore += confidenceScores[idx]
     }
 
-    person.keyPoints = keypointList.toList()
+    person.keyPoints = keypointList.toMutableList()
     person.score = totalScore / numKeypoints
 
     return person

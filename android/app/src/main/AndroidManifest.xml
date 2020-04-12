@@ -15,7 +15,7 @@
       android:label="@string/tfe_pn_app_name"
       android:roundIcon="@mipmap/ic_launcher_round"
       android:supportsRtl="true"
-      android:theme="@style/AppTheme.Posenet">
+      android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen">
 
     <activity
         android:name=".TestActivity"

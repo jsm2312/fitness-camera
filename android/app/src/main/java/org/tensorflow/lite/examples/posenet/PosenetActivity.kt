@@ -56,7 +56,9 @@ import android.view.SurfaceHolder
 import android.view.SurfaceView
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import android.widget.Toast
+import kotlinx.android.synthetic.main.tfe_pn_activity_posenet.*
 import java.util.concurrent.Semaphore
 import java.util.concurrent.TimeUnit
 import kotlin.math.abs
@@ -85,6 +87,7 @@ class PosenetActivity :
     Pair(BodyPart.RIGHT_KNEE, BodyPart.RIGHT_ANKLE)
   )
 
+  private var textView: TextView? = null
   private val counter = RepetitionCounter()
 
   /** Threshold for confidence score. */
@@ -217,6 +220,7 @@ class PosenetActivity :
   ): View? = inflater.inflate(R.layout.tfe_pn_activity_posenet, container, false)
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    textView = view.findViewById(R.id.textView)
     surfaceView = view.findViewById(R.id.surfaceView)
     surfaceHolder = surfaceView!!.holder
   }
@@ -489,7 +493,7 @@ class PosenetActivity :
 
   /** Set the paint color and size.    */
   private fun setPaint() {
-    paint.color = Color.RED
+    paint.color = Color.WHITE
     paint.textSize = 80.0f
     paint.strokeWidth = 8.0f
   }
@@ -519,12 +523,12 @@ class PosenetActivity :
     bottom = top + screenHeight
 
     setPaint()
-    canvas.drawBitmap(
-      bitmap,
-      Rect(0, 0, bitmap.width, bitmap.height),
-      Rect(left, top, right, bottom),
-      paint
-    )
+//    canvas.drawBitmap(
+//      bitmap,
+//      Rect(0, 0, bitmap.width, bitmap.height),
+//      Rect(left, top, right, bottom),
+//      paint
+//    )
 
     val widthRatio = screenWidth.toFloat() / MODEL_WIDTH
     val heightRatio = screenHeight.toFloat() / MODEL_HEIGHT
@@ -554,24 +558,24 @@ class PosenetActivity :
       }
     }
 
-    canvas.drawText(
-      "Score: %.2f".format(person.score),
-      (15.0f * widthRatio),
-      (30.0f * heightRatio + bottom),
-      paint
-    )
-    canvas.drawText(
-      "Device: %s".format(posenet.device),
-      (15.0f * widthRatio),
-      (50.0f * heightRatio + bottom),
-      paint
-    )
-    canvas.drawText(
-      "Time: %.2f ms".format(posenet.lastInferenceTimeNanos * 1.0f / 1_000_000),
-      (15.0f * widthRatio),
-      (70.0f * heightRatio + bottom),
-      paint
-    )
+//    canvas.drawText(
+//      "Score: %.2f".format(person.score),
+//      (15.0f * widthRatio),
+//      (30.0f * heightRatio + bottom),
+//      paint
+//    )
+//    canvas.drawText(
+//      "Device: %s".format(posenet.device),
+//      (15.0f * widthRatio),
+//      (50.0f * heightRatio + bottom),
+//      paint
+//    )
+//    canvas.drawText(
+//      "Time: %.2f ms".format(posenet.lastInferenceTimeNanos * 1.0f / 1_000_000),
+//      (15.0f * widthRatio),
+//      (70.0f * heightRatio + bottom),
+//      paint
+//    )
 
     // Draw!
     surfaceHolder!!.unlockCanvasAndPost(canvas)
@@ -586,10 +590,38 @@ class PosenetActivity :
     val scaledBitmap = Bitmap.createScaledBitmap(croppedBitmap, MODEL_WIDTH, MODEL_HEIGHT, true)
 
     // Perform inference.
-    val person = posenet.estimateSinglePose(scaledBitmap)
+    var person = posenet.estimateSinglePose(scaledBitmap)
+    person = swapBodyParts(person)
     val canvas: Canvas = surfaceHolder!!.lockCanvas()
-    counter.OnFrame(person);
+    counter.OnFrame(person)
     draw(canvas, person, scaledBitmap)
+  }
+
+  // To prevent horizontal miscategorization of body parts,
+  // and assuming that the user is always facing the camera,
+  // we make sure that body parts are on the right side of the body.
+  private fun swapBodyParts(person: Person): Person {
+    swap(person, BodyPart.LEFT_SHOULDER, BodyPart.RIGHT_SHOULDER);
+    swap(person, BodyPart.LEFT_ANKLE, BodyPart.RIGHT_ANKLE);
+    swap(person, BodyPart.LEFT_EAR, BodyPart.RIGHT_EAR);
+    swap(person, BodyPart.LEFT_ELBOW, BodyPart.RIGHT_ELBOW);
+    swap(person, BodyPart.LEFT_EYE, BodyPart.RIGHT_EYE);
+    swap(person, BodyPart.LEFT_HIP, BodyPart.RIGHT_HIP);
+    swap(person, BodyPart.LEFT_KNEE, BodyPart.RIGHT_KNEE);
+    swap(person, BodyPart.LEFT_WRIST, BodyPart.RIGHT_WRIST);
+
+    return person;
+  }
+
+  private fun swap(person: Person, left: BodyPart, right: BodyPart) {
+    if (person.keyPoints[right.ordinal].score >= minConfidence
+      && person.keyPoints[left.ordinal].score >= minConfidence
+      && person.keyPoints[right.ordinal].position.x > person.keyPoints[left.ordinal].position.x) {
+      Log.i("posenet", "Swapping ${left} and ${right}.");
+      val temp = person.keyPoints[right.ordinal]
+      person.keyPoints[right.ordinal] = person.keyPoints[left.ordinal]
+      person.keyPoints[left.ordinal] = temp
+    }
   }
 
   /**
