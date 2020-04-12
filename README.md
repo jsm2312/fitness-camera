@@ -6,13 +6,7 @@ Turn your phone camera into a fitness tracker.
 
 This is an Android application that uses human pose estimation with TensorFlow Lite to detect and count exercises using your phone's front-facing camera.
 
-## Installation
-
-Fitness Camera v0.1.0 is now available for Android!
-
-[Click here to download and install the APK](https://github.com/miguelrochefort/fitness-camera/releases/download/v0.1.0/fitnesscamera-20200412T0154.apk)
-
-*Note: All processing is done locally on your device. Nothing is ever sent to a server. In fact, the app doesn't even have permissions to access the Internet.*
+[Now available on Android!](https://github.com/miguelrochefort/fitness-camera/releases/tag/v0.1.0)
 
 ## Demo
 
