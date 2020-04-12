@@ -20,6 +20,7 @@ import android.Manifest
 import android.app.AlertDialog
 import android.app.Dialog
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Resources
 import android.graphics.Bitmap
@@ -41,6 +42,7 @@ import android.hardware.camera2.TotalCaptureResult
 import android.media.Image
 import android.media.ImageReader
 import android.media.ImageReader.OnImageAvailableListener
+import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.HandlerThread
@@ -48,6 +50,8 @@ import android.support.v4.app.ActivityCompat
 import android.support.v4.app.DialogFragment
 import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
+import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.RecyclerView
 import android.util.Log
 import android.util.Size
 import android.util.SparseIntArray
@@ -59,14 +63,13 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
-import kotlinx.android.synthetic.main.tfe_pn_activity_posenet.*
 import java.util.concurrent.Semaphore
 import java.util.concurrent.TimeUnit
 import kotlin.math.abs
 import com.miguelrochefort.fitnesscamera.lib.BodyPart
-import com.miguelrochefort.fitnesscamera.lib.Device
 import com.miguelrochefort.fitnesscamera.lib.Person
 import com.miguelrochefort.fitnesscamera.lib.Posenet
+import java.net.URLEncoder
 
 class PosenetActivity :
   Fragment(),
@@ -93,6 +96,7 @@ class PosenetActivity :
     Pair(BodyPart.MID_HIP, BodyPart.MID_SHOULDER)
   )
 
+  private var recyclerView: RecyclerView? = null
   private var textView: TextView? = null
   private var counter: RepetitionCounter? = null
 
@@ -228,17 +232,28 @@ class PosenetActivity :
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     textView = view.findViewById(R.id.textView)
+    recyclerView = view.findViewById(R.id.recyclerView)
     surfaceView = view.findViewById(R.id.surfaceView)
     surfaceHolder = surfaceView!!.holder
     counter = RepetitionCounter(this.context!!)
 
     textView?.setOnClickListener { view ->
-      counter?.Reset()
+      val reps = counter!!.count
+      val note = "#pushups(${reps})"
+      val encodedNote = URLEncoder.encode(note, "utf-8")
+      val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://open.nomie.app?note=${encodedNote}"))
+      startActivity(browserIntent)
+
+      //counter?.Reset()
     }
 
     surfaceView?.setOnClickListener { view ->
       previewMode = (previewMode + 1) % PREVIEW_MODES
     }
+
+    recyclerView!!.layoutManager = LinearLayoutManager(context)
+    recyclerView!!.adapter =
+      MyAdapter(counter!!)
   }
 
   override fun onResume() {
@@ -568,7 +583,10 @@ class PosenetActivity :
           val position = keyPoint.position
           val adjustedX: Float = position.x.toFloat() * widthRatio + left
           val adjustedY: Float = position.y.toFloat() * heightRatio + top
-          val radius = if (keyPoint.bodyPart.ordinal < 5) smallCircleRadius else circleRadius // nose, eyes, ears
+          var radius = if (keyPoint.bodyPart.ordinal < 5) smallCircleRadius else circleRadius // nose, eyes, ears
+          if (keyPoint.bodyPart == BodyPart.NOSE) {
+            radius = 60.0f
+          }
           canvas.drawCircle(adjustedX, adjustedY, radius, paint)
         }
       }
