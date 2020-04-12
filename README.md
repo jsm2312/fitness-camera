@@ -26,7 +26,7 @@ Make sure to check-out my [Frontier post](https://frontier.pioneer.app/posts/135
 
 ## Related work
 
-* [Onxy](https://www.onyx.fit/)
+* [Onyx](https://www.onyx.fit/)
 * [Tempo](https://tempo.fit/product)
 * [GymCam](https://www.cmu.edu/news/stories/archives/2019/september/gymcam.html)
 * [Live Repetition Counting](https://www.cs.tau.ac.il/~wolf/papers/repcounticcv.pdf) [PDF]
