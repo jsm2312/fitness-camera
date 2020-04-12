@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.tensorflow.lite.examples.posenet;
+package com.miguelrochefort.fitnesscamera;
 
 import static org.junit.Assert.*;
 
@@ -36,6 +36,6 @@ public class ExampleInstrumentedTest {
     // Context of the app under test.
     Context appContext = InstrumentationRegistry.getTargetContext();
 
-    assertEquals("org.tensorflow.lite.examples.posenet.test", appContext.getPackageName());
+    assertEquals("com.miguelrochefort.fitnesscamera.test", appContext.getPackageName());
   }
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.tensorflow.lite.examples.posenet
+package com.miguelrochefort.fitnesscamera
 
 import android.Manifest
 import android.app.AlertDialog

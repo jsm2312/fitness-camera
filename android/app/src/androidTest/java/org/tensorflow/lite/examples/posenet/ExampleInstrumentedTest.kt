@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.tensorflow.lite.examples.posenet
+package com.miguelrochefort.fitnesscamera
 
 import androidx.test.InstrumentationRegistry
 import androidx.test.runner.AndroidJUnit4
@@ -33,6 +33,6 @@ class ExampleInstrumentedTest {
   fun useAppContext() {
     // Context of the app under test.
     val appContext = InstrumentationRegistry.getTargetContext()
-    assertEquals("org.tensorflow.lite.examples.posenet", appContext.packageName)
+    assertEquals("com.miguelrochefort.fitnesscamera", appContext.packageName)
   }
 }

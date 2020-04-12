@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.tensorflow.lite.examples.posenet
+package com.miguelrochefort.fitnesscamera
 
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity

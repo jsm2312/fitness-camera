@@ -1,11 +1,11 @@
-package org.tensorflow.lite.examples.posenet
+package com.miguelrochefort.fitnesscamera
 
 import android.content.Context
 import android.speech.tts.TextToSpeech
 import android.speech.tts.TextToSpeech.OnInitListener
 import android.speech.tts.TextToSpeech.QUEUE_ADD
-import org.tensorflow.lite.examples.posenet.lib.BodyPart
-import org.tensorflow.lite.examples.posenet.lib.Person
+import com.miguelrochefort.fitnesscamera.lib.BodyPart
+import com.miguelrochefort.fitnesscamera.lib.Person
 
 
 class RepetitionCounter(context: Context) {

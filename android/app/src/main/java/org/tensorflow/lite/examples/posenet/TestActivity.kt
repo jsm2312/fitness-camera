@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.tensorflow.lite.examples.posenet
+package com.miguelrochefort.fitnesscamera
 
 import android.graphics.Bitmap
 import android.graphics.Canvas
@@ -25,7 +25,7 @@ import android.os.Bundle
 import android.support.v4.content.res.ResourcesCompat
 import android.support.v7.app.AppCompatActivity
 import android.widget.ImageView
-import org.tensorflow.lite.examples.posenet.lib.Posenet as Posenet
+import com.miguelrochefort.fitnesscamera.lib.Posenet as Posenet
 
 class TestActivity : AppCompatActivity() {
   /** Returns a resized bitmap of the drawable image.    */

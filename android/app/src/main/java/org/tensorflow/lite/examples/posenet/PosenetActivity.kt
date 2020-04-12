@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.tensorflow.lite.examples.posenet
+package com.miguelrochefort.fitnesscamera
 
 import android.Manifest
 import android.app.AlertDialog
@@ -63,10 +63,10 @@ import kotlinx.android.synthetic.main.tfe_pn_activity_posenet.*
 import java.util.concurrent.Semaphore
 import java.util.concurrent.TimeUnit
 import kotlin.math.abs
-import org.tensorflow.lite.examples.posenet.lib.BodyPart
-import org.tensorflow.lite.examples.posenet.lib.Device
-import org.tensorflow.lite.examples.posenet.lib.Person
-import org.tensorflow.lite.examples.posenet.lib.Posenet
+import com.miguelrochefort.fitnesscamera.lib.BodyPart
+import com.miguelrochefort.fitnesscamera.lib.Device
+import com.miguelrochefort.fitnesscamera.lib.Person
+import com.miguelrochefort.fitnesscamera.lib.Posenet
 
 class PosenetActivity :
   Fragment(),
