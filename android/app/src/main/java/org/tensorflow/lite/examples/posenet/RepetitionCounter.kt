@@ -39,10 +39,10 @@ class RepetitionCounter(context: Context) {
 
         // Simple repetition count using only the nose as key point
         if (person.keyPoints[BodyPart.NOSE.ordinal].score >= MIN_CONFIDENCE) {
-            var y = 10000 - person.keyPoints[BodyPart.NOSE.ordinal].position.y
+            var y = 1000 - person.keyPoints[BodyPart.NOSE.ordinal].position.y
             var dy = y - prev_y
             if (!first) {
-                if (bottom != 1000000 && top != 0) {
+                if (bottom != 0 && top != 0) {
                     if (goal == 1 && dy > 0 && (y - bottom) > (top - bottom) * REP_THRESHOLD) {
                         if (top - bottom > MIN_AMPLITUDE) {
                             count++
