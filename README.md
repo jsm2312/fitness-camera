@@ -24,6 +24,13 @@ This was built in the context of [Pioneer's Hackathon](https://pioneer.app/hacka
 
 Make sure to check-out my [Frontier post](https://frontier.pioneer.app/posts/135-fitness-camera) and leave a comment!
 
+## Related work
+
+* [Onxy](https://www.onyx.fit/)
+* [Tempo](https://tempo.fit/product)
+* [GymCam](https://www.cmu.edu/news/stories/archives/2019/september/gymcam.html)
+* [Live Repetition Counting](https://www.cs.tau.ac.il/~wolf/papers/repcounticcv.pdf) [PDF]
+
 ## License
 
 [Apache License 2.0](LICENSE)
