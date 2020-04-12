@@ -45,7 +45,9 @@ enum class BodyPart {
   LEFT_KNEE,
   RIGHT_KNEE,
   LEFT_ANKLE,
-  RIGHT_ANKLE
+  RIGHT_ANKLE,
+  MID_SHOULDER,
+  MID_HIP,
 }
 
 class Position {
@@ -259,14 +261,30 @@ class Posenet(
     }
 
     val person = Person()
-    val keypointList = Array(numKeypoints) { KeyPoint() }
+    val keypointList = Array(numKeypoints + 2) { KeyPoint() }
     var totalScore = 0.0f
     enumValues<BodyPart>().forEachIndexed { idx, it ->
-      keypointList[idx].bodyPart = it
-      keypointList[idx].position.x = xCoords[idx]
-      keypointList[idx].position.y = yCoords[idx]
-      keypointList[idx].score = confidenceScores[idx]
-      totalScore += confidenceScores[idx]
+      if (idx == numKeypoints + 0) {
+        // Add MID_SHOULDER
+        keypointList[idx].bodyPart = it
+        keypointList[idx].position.x = (xCoords[BodyPart.LEFT_SHOULDER.ordinal] + xCoords[BodyPart.RIGHT_SHOULDER.ordinal]) / 2
+        keypointList[idx].position.y = (yCoords[BodyPart.LEFT_SHOULDER.ordinal] + yCoords[BodyPart.RIGHT_SHOULDER.ordinal]) / 2
+        keypointList[idx].score = (confidenceScores[BodyPart.LEFT_SHOULDER.ordinal] + yCoords[BodyPart.RIGHT_SHOULDER.ordinal]) / 2
+      }
+      else if (idx == numKeypoints + 1) {
+        // ADD MID_HIP
+        keypointList[idx].bodyPart = it
+        keypointList[idx].position.x = (xCoords[BodyPart.LEFT_HIP.ordinal] + xCoords[BodyPart.RIGHT_HIP.ordinal]) / 2
+        keypointList[idx].position.y = (yCoords[BodyPart.LEFT_HIP.ordinal] + yCoords[BodyPart.RIGHT_HIP.ordinal]) / 2
+        keypointList[idx].score = (confidenceScores[BodyPart.LEFT_HIP.ordinal] + yCoords[BodyPart.RIGHT_HIP.ordinal]) / 2
+      }
+      else {
+        keypointList[idx].bodyPart = it
+        keypointList[idx].position.x = xCoords[idx]
+        keypointList[idx].position.y = yCoords[idx]
+        keypointList[idx].score = confidenceScores[idx]
+        totalScore += confidenceScores[idx]
+      }
     }
 
     person.keyPoints = keypointList.toMutableList()

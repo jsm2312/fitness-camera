@@ -85,13 +85,12 @@ class PosenetActivity :
     Pair(BodyPart.LEFT_SHOULDER, BodyPart.RIGHT_SHOULDER),
     Pair(BodyPart.RIGHT_SHOULDER, BodyPart.RIGHT_ELBOW),
     Pair(BodyPart.RIGHT_ELBOW, BodyPart.RIGHT_WRIST),
-    Pair(BodyPart.LEFT_SHOULDER, BodyPart.LEFT_HIP),
     Pair(BodyPart.LEFT_HIP, BodyPart.RIGHT_HIP),
-    Pair(BodyPart.RIGHT_HIP, BodyPart.RIGHT_SHOULDER),
     Pair(BodyPart.LEFT_HIP, BodyPart.LEFT_KNEE),
     Pair(BodyPart.LEFT_KNEE, BodyPart.LEFT_ANKLE),
     Pair(BodyPart.RIGHT_HIP, BodyPart.RIGHT_KNEE),
-    Pair(BodyPart.RIGHT_KNEE, BodyPart.RIGHT_ANKLE)
+    Pair(BodyPart.RIGHT_KNEE, BodyPart.RIGHT_ANKLE),
+    Pair(BodyPart.MID_HIP, BodyPart.MID_SHOULDER)
   )
 
   private var textView: TextView? = null
@@ -101,7 +100,8 @@ class PosenetActivity :
   private val minConfidence = 0.5
 
   /** Radius of circle used to draw keypoints.  */
-  private val circleRadius = 8.0f
+  private val circleRadius = 16.0f
+  private val smallCircleRadius = 8.0f
 
   /** Paint class holds the style and color information to draw geometries,text and bitmaps. */
   private var paint = Paint()
@@ -519,6 +519,7 @@ class PosenetActivity :
   /** Set the paint color and size.    */
   private fun setPaint() {
     paint.color = Color.WHITE
+    paint.alpha = 128
     paint.textSize = 80.0f
     paint.strokeWidth = 8.0f
   }
@@ -567,7 +568,8 @@ class PosenetActivity :
           val position = keyPoint.position
           val adjustedX: Float = position.x.toFloat() * widthRatio + left
           val adjustedY: Float = position.y.toFloat() * heightRatio + top
-          canvas.drawCircle(adjustedX, adjustedY, circleRadius, paint)
+          val radius = if (keyPoint.bodyPart.ordinal < 5) smallCircleRadius else circleRadius // nose, eyes, ears
+          canvas.drawCircle(adjustedX, adjustedY, radius, paint)
         }
       }
 
@@ -622,7 +624,7 @@ class PosenetActivity :
     var person = posenet.estimateSinglePose(scaledBitmap)
     person = swapBodyParts(person)
     val canvas: Canvas = surfaceHolder!!.lockCanvas()
-    val count = counter?.OnFrame(person)
+    val count = counter!!.OnFrame(person)
     this.activity!!.runOnUiThread{
         textView!!.text = (count).toString()
     }
