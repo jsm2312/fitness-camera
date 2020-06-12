@@ -23,14 +23,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Resources
-import android.graphics.Bitmap
-import android.graphics.Canvas
-import android.graphics.Color
-import android.graphics.ImageFormat
-import android.graphics.Matrix
-import android.graphics.Paint
-import android.graphics.PorterDuff
-import android.graphics.Rect
+import android.graphics.*
 import android.hardware.camera2.CameraAccessException
 import android.hardware.camera2.CameraCaptureSession
 import android.hardware.camera2.CameraCharacteristics
@@ -46,12 +39,12 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.HandlerThread
-import android.support.v4.app.ActivityCompat
-import android.support.v4.app.DialogFragment
-import android.support.v4.app.Fragment
-import android.support.v4.content.ContextCompat
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
+import androidx.core.app.ActivityCompat
+import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.Fragment
+import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import android.util.Log
 import android.util.Size
 import android.util.SparseIntArray
@@ -95,6 +88,8 @@ class PosenetActivity :
     Pair(BodyPart.RIGHT_KNEE, BodyPart.RIGHT_ANKLE),
     Pair(BodyPart.MID_HIP, BodyPart.MID_SHOULDER)
   )
+
+  private var maskBitmap: Bitmap? = null
 
   private var recyclerView: RecyclerView? = null
   private var textView: TextView? = null
@@ -231,6 +226,7 @@ class PosenetActivity :
   ): View? = inflater.inflate(R.layout.tfe_pn_activity_posenet, container, false)
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    maskBitmap = BitmapFactory.decodeResource(resources, R.drawable.mask)
     textView = view.findViewById(R.id.textView)
     recyclerView = view.findViewById(R.id.recyclerView)
     surfaceView = view.findViewById(R.id.surfaceView)
@@ -251,7 +247,8 @@ class PosenetActivity :
       previewMode = (previewMode + 1) % PREVIEW_MODES
     }
 
-    recyclerView!!.layoutManager = LinearLayoutManager(context)
+    recyclerView!!.layoutManager =
+      LinearLayoutManager(context)
     recyclerView!!.adapter =
       MyAdapter(counter!!)
   }
@@ -577,6 +574,16 @@ class PosenetActivity :
     val heightRatio = screenHeight.toFloat() / MODEL_HEIGHT
 
     if (previewMode == 0 || previewMode == 1) {
+      val x1 = person.keyPoints[BodyPart.LEFT_EYE.ordinal].position.x
+      val y1 = person.keyPoints[BodyPart.LEFT_EYE.ordinal].position.y
+      val x2 = person.keyPoints[BodyPart.RIGHT_EYE.ordinal].position.x
+      val y2 = person.keyPoints[BodyPart.RIGHT_EYE.ordinal].position.y
+      val dx = ((x2 - x1) * widthRatio).toDouble()
+      val dy = ((y2 - y1) * heightRatio).toDouble()
+
+
+
+
       // Draw key points over the image.
       for (keyPoint in person.keyPoints) {
         if (keyPoint.score > minConfidence) {
@@ -585,7 +592,20 @@ class PosenetActivity :
           val adjustedY: Float = position.y.toFloat() * heightRatio + top
           var radius = if (keyPoint.bodyPart.ordinal < 5) smallCircleRadius else circleRadius // nose, eyes, ears
           if (keyPoint.bodyPart == BodyPart.NOSE) {
-            radius = 60.0f
+
+            var eyeDistance = Math.sqrt(Math.pow(dx, 2.0) + Math.pow(dy, 2.0))
+            val headSize = eyeDistance.toFloat() * 2.4f
+            val headTilt = Math.atan2(dy, dx)
+            val maskWidth = headSize
+            val maskHeight = headSize
+            val maskX = adjustedX - (maskWidth / 2)
+            val maskY = adjustedY - (maskHeight / 4)
+            val matrix = Matrix();
+            matrix.postScale(0.1f, 0.1f);
+            matrix.setTranslate(maskX, maskY);
+            matrix.postRotate(180 + Math.toDegrees(headTilt).toFloat(), adjustedX, adjustedY) //, maskX, maskY);
+            canvas.drawBitmap(maskBitmap!!, matrix, null)
+            //canvas.drawBitmap(maskBitmap!!, null, RectF(maskX, maskY, maskX + maskWidth, maskY + maskHeight), null) // adjustedX, adjustedY, null);
           }
           canvas.drawCircle(adjustedX, adjustedY, radius, paint)
         }

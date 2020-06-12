@@ -10,6 +10,7 @@ import com.miguelrochefort.fitnesscamera.lib.Person
 
 class RepetitionCounter(context: Context) {
 
+    val sets: MutableList<ExerciseSet> = mutableListOf()
     val tts: TextToSpeech
 
     init {
